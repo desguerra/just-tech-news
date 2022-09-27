@@ -5,20 +5,34 @@ const path = require('path');
 // set up handlebars
 const exphbs = require('express-handlebars');
 const hbs = exphbs.create({});
+// set up sessions
+const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const sess = {
+    secret: 'Super secret secret',
+    cookie: {},
+    resave: false,
+    saveUninitialized: true,
+    store: new SequelizeStore({
+        db: sequelize,
+    }),
+};
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// built-in Express.js middleware function that can take 
-// all of the contents of a folder and serve them as static 
-// assets. Useful for front-end specific files like images, 
+// built-in Express.js middleware function that can take
+// all of the contents of a folder and serve them as static
+// assets. Useful for front-end specific files like images,
 // style sheets, and JavaScript files.
 app.use(express.static(path.join(__dirname, 'public')));
 // set up handlebars as app's engine
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
+// set up sessions
+app.use(session(sess));
 
 // turn on routes
 app.use(routes);
